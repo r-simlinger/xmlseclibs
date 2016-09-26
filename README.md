@@ -35,8 +35,8 @@ xmlseclibs is being used in many different software.
 The example below shows basic usage of xmlseclibs, with a SHA-256 signature.
 
 ```php
-use RobRichards\XMLSecLibs\XMLSecurityDSig;
-use RobRichards\XMLSecLibs\XMLSecurityKey;
+use Simlinger\XMLSecLibs\XMLSecurityDSig;
+use Simlinger\XMLSecLibs\XMLSecurityKey;
 
 // Load the XML to be signed
 $doc = new DOMDocument();

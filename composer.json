@@ -1,6 +1,7 @@
 {
-  "name": "robrichards/xmlseclibs",
+  "name": "r-simlinger/xmlseclibs",
   "description": "A PHP library for XML Security",
+  "version": "1.0.0",
   "license": "BSD-3-Clause",
   "keywords": [
     "xml",
@@ -11,7 +12,7 @@
   "homepage": "https://github.com/robrichards/xmlseclibs",
   "autoload": {
     "psr-4": {
-      "RobRichards\\XMLSecLibs\\": "src"
+      "Simlinger\\XMLSecLibs\\": "src"
     }
   },
   "require": {

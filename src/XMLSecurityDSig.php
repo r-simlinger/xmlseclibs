@@ -1,5 +1,5 @@
 <?php
-namespace RobRichards\XMLSecLibs;
+namespace Simlinger\XMLSecLibs;
 
 use DOMDocument;
 use DOMElement;
