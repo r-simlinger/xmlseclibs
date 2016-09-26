@@ -633,6 +633,7 @@ class XMLSecurityDSig
             }
             if (empty($uri)) {
                 $uri = self::generateGUID();
+                $uri = 'Body';
                 $node->setAttributeNS($prefix_ns, $attname, $uri);
             }
             $refNode->setAttribute("URI", '#'.$uri);
@@ -988,62 +989,8 @@ class XMLSecurityDSig
         $x509DataNode = $baseDoc->createElementNS(self::XMLDSIGNS, $dsig_pfx.'X509Data');
         $keyInfo->appendChild($x509DataNode);
 
-        $issuerSerial = false;
-        $subjectName = false;
-        if (is_array($options)) {
-            if (! empty($options['issuerSerial'])) {
-                $issuerSerial = true;
-            }
-            if (! empty($options['subjectName'])) {
-                $subjectName = true;
-            }
-        }
-
         // Attach all certificate nodes and any additional data
         foreach ($certs as $X509Cert) {
-            if ($issuerSerial || $subjectName) {
-                if ($certData = openssl_x509_parse("-----BEGIN CERTIFICATE-----\n".chunk_split($X509Cert, 64, "\n")."-----END CERTIFICATE-----\n")) {
-                    if ($subjectName && ! empty($certData['subject'])) {
-                        if (is_array($certData['subject'])) {
-                            $parts = array();
-                            foreach ($certData['subject'] AS $key => $value) {
-                                if (is_array($value)) {
-                                    foreach ($value as $valueElement) {
-                                        array_unshift($parts, "$key=$valueElement");
-                                    }
-                                } else {
-                                    array_unshift($parts, "$key=$value");
-                                }
-                            }
-                            $subjectNameValue = implode(',', $parts);
-                        } else {
-                            $subjectNameValue = $certData['issuer'];
-                        }
-                        $x509SubjectNode = $baseDoc->createElementNS(self::XMLDSIGNS, $dsig_pfx.'X509SubjectName', $subjectNameValue);
-                        $x509DataNode->appendChild($x509SubjectNode);
-                    }
-                    if ($issuerSerial && ! empty($certData['issuer']) && ! empty($certData['serialNumber'])) {
-                        if (is_array($certData['issuer'])) {
-                            $parts = array();
-                            foreach ($certData['issuer'] AS $key => $value) {
-                                array_unshift($parts, "$key=$value");
-                            }
-                            $issuerName = implode(',', $parts);
-                        } else {
-                            $issuerName = $certData['issuer'];
-                        }
-
-                        $x509IssuerNode = $baseDoc->createElementNS(self::XMLDSIGNS, $dsig_pfx.'X509IssuerSerial');
-                        $x509DataNode->appendChild($x509IssuerNode);
-
-                        $x509Node = $baseDoc->createElementNS(self::XMLDSIGNS, $dsig_pfx.'X509IssuerName', $issuerName);
-                        $x509IssuerNode->appendChild($x509Node);
-                        $x509Node = $baseDoc->createElementNS(self::XMLDSIGNS, $dsig_pfx.'X509SerialNumber', $certData['serialNumber']);
-                        $x509IssuerNode->appendChild($x509Node);
-                    }
-                }
-
-            }
             $x509CertNode = $baseDoc->createElementNS(self::XMLDSIGNS, $dsig_pfx.'X509Certificate', $X509Cert);
             $x509DataNode->appendChild($x509CertNode);
         }
