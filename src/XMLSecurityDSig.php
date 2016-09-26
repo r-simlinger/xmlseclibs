@@ -61,15 +61,9 @@ class XMLSecurityDSig
     const EXC_C14N = 'http://www.w3.org/2001/10/xml-exc-c14n#';
     const EXC_C14N_COMMENTS = 'http://www.w3.org/2001/10/xml-exc-c14n#WithComments';
 
-    const template = '<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
-  <ds:SignedInfo>
-    <ds:SignatureMethod />
-  </ds:SignedInfo>
-</ds:Signature>';
-
     const BASE_TEMPLATE = '<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
   <SignedInfo>
-    <SignatureMethod />
+    <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
   </SignedInfo>
 </Signature>';
 
@@ -632,9 +626,9 @@ class XMLSecurityDSig
                 $uri = $prefix_ns ? $node->getAttributeNS($prefix_ns, $id_name) : $node->getAttribute($id_name);
             }
             if (empty($uri)) {
-                $uri = self::generateGUID();
                 $uri = 'Body';
-                $node->setAttributeNS($prefix_ns, $attname, $uri);
+                $node->setAttributeNS('http://www.w3.org/2000/xmlns/' ,'xmlns:wsu', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd');
+                $node->setAttribute('wsu:Id', $uri);
             }
             $refNode->setAttribute("URI", '#'.$uri);
         } elseif ($force_uri) {
