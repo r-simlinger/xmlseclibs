@@ -292,6 +292,7 @@ class XMLSecurityDSig
 
         $doc = $this->sigNode->ownerDocument;
         $canonicalmethod = null;
+        $prefixList = null;
         if ($doc) {
             $xpath = $this->getXPathObj();
             $query = "./secdsig:SignedInfo";
@@ -301,8 +302,21 @@ class XMLSecurityDSig
                 $nodeset = $xpath->query($query, $signInfoNode);
                 if ($canonNode = $nodeset->item(0)) {
                     $canonicalmethod = $canonNode->getAttribute('Algorithm');
+
+                    // Handle 'PrefixList' attribute
+                    if (in_array($canonicalmethod, [self::EXC_C14N, self::EXC_C14N_COMMENTS])) {
+                        $xpath = $this->getXPathObj();
+                        $xpath->registerNamespace('ec', $canonicalmethod);
+                        $query = "./ec:InclusiveNamespaces";
+                        $nodeset = $xpath->query($query, $canonNode);
+                        if ($inclusiveNamespaces = $nodeset->item(0)) {
+                            $prefixList = $inclusiveNamespaces->getAttribute('PrefixList');
+                            $prefixList = explode(' ', $prefixList);
+                        }
+                    }
                 }
-                $this->signedInfo = $this->canonicalizeData($signInfoNode, $canonicalmethod);
+
+                $this->signedInfo = $this->canonicalizeData($signInfoNode, $canonicalmethod, null, $prefixList);
                 return $this->signedInfo;
             }
         }
